@@ -45,49 +45,72 @@
 
         <!-- Main Content -->
         <main class="flex-1 overflow-y-auto p-8">
-            <!-- Inventory Management Section -->
             <section id="inventory-section" class="section">
                 <div class="mb-6">
                     <h1 class="text-2xl font-semibold text-gray-800">Inventory Management</h1>
                 </div>
-                
+
                 <!-- Tabs -->
                 <div class="tab-container flex mb-8">
-                    <button class="tab active" data-tab="site">Monitoring Stok Site</button>
-                    <button class="tab" data-tab="pabrik">Monitoring Stok Pabrik</button>
+                    <button class="tab active" data-tab="ok">Monitoring OK</button>
+                    <button class="tab" data-tab="spprb">Monitoring SPPRB</button>
+                    <button class="tab" data-tab="produksi">Monitoring Produksi</button>
+                    <button class="tab" data-tab="distribusi">Monitoring Distribusi</button>
+                    <button class="tab" data-tab="lancar">Monitoring Stok Lancar</button>
                     <button class="tab" data-tab="bebas">Monitoring Stok Bebas</button>
-                    <button class="tab" data-tab="titipan">Monitoring Stok Titipan</button>
+                    <button class="tab" data-tab="titipan-percepatan">Monitoring Stok Titipan Percepatan</button>
+                    <button class="tab" data-tab="titipan-murni">Monitoring Stok Titipan Murni</button>
                 </div>
 
-                <!-- Metrics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="metric-card">
-                        <h3 class="text-lg font-semibold mb-2">Jumlah Stok</h3>
-                        <p class="text-3xl font-bold text-primary" id="total-stock">0</p>
+                <!-- Tabs Content -->
+                <div id="tab-contents">
+                    <div class="tab-content" id="ok">
+                        <h2 class="text-xl font-bold mb-4">Monitoring OK</h2>
+                        <canvas id="chart-ok-sbu"></canvas>
+                        <canvas id="chart-ok-ppb"></canvas>
+                        <canvas id="chart-ok-tahun"></canvas>
+                        <canvas id="chart-ok-tren"></canvas>
                     </div>
-                    <div class="metric-card">
-                        <h3 class="text-lg font-semibold mb-2">Saldo Saat Ini</h3>
-                        <p class="text-3xl font-bold text-primary" id="current-balance">0</p>
-                    </div>
-                    <div class="metric-card">
-                        <h3 class="text-lg font-semibold mb-2">Umur Stok Rata-rata</h3>
-                        <p class="text-3xl font-bold text-primary" id="avg-age">0</p>
-                    </div>
-                </div>
 
-                <!-- Charts -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="chart-container">
-                        <h3 class="text-lg font-semibold mb-4">Jumlah Stok per SBU</h3>
-                        <canvas id="sbuChart"></canvas>
+                    <div class="tab-content hidden" id="spprb">
+                        <h2 class="text-xl font-bold mb-4">Monitoring SPPRB</h2>
+                        <canvas id="chart-spprb-sbu"></canvas>
+                        <canvas id="chart-spprb-ppb"></canvas>
                     </div>
-                    <div class="chart-container">
-                        <h3 class="text-lg font-semibold mb-4">Jumlah Stok per PBB</h3>
-                        <canvas id="pbbChart"></canvas>
+
+                    <div class="tab-content hidden" id="produksi">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Produksi</h2>
+                        <canvas id="chart-produksi"></canvas>
                     </div>
-                    <div class="chart-container">
-                        <h3 class="text-lg font-semibold mb-4">Jumlah Stok per Tahun</h3>
-                        <canvas id="yearChart"></canvas>
+
+                    <div class="tab-content hidden" id="distribusi">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Distribusi</h2>
+                        <canvas id="chart-distribusi-saldo"></canvas>
+                        <canvas id="chart-distribusi-mutasi"></canvas>
+                    </div>
+
+                    <div class="tab-content hidden" id="lancar">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Stok Lancar</h2>
+                        <canvas id="chart-lancar-tahun"></canvas>
+                        <canvas id="chart-lancar-sbu"></canvas>
+                    </div>
+
+                    <div class="tab-content hidden" id="bebas">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Stok Bebas</h2>
+                        <canvas id="chart-bebas-proyek"></canvas>
+                        <canvas id="chart-bebas-area"></canvas>
+                    </div>
+
+                    <div class="tab-content hidden" id="titipan-percepatan">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Titipan Percepatan</h2>
+                        <canvas id="chart-percepatan-sbu"></canvas>
+                        <canvas id="chart-percepatan-mutasi"></canvas>
+                    </div>
+
+                    <div class="tab-content hidden" id="titipan-murni">
+                        <h2 class="text-xl font-bold mb-4">Monitoring Titipan Murni</h2>
+                        <canvas id="chart-murni-ppb"></canvas>
+                        <canvas id="chart-murni-mutasi"></canvas>
                     </div>
                 </div>
             </section>
@@ -110,8 +133,6 @@
                             </div>
                         </label>
                     </div>
-                    
-                    <!-- Preview Section -->
                     <div id="preview-section" class="mt-8 hidden">
                         <h2 class="text-lg font-semibold mb-4">Data Preview</h2>
                         <div class="overflow-x-auto">
