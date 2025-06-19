@@ -1,4 +1,8 @@
-// File upload handling
+// File: upload.js
+
+// Global cache to store processed data
+const processedStockDataByTab = {};
+
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('excelFile');
     const previewSection = document.getElementById('preview-section');
@@ -15,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     uploadContainer.appendChild(loadingIndicator);
 
-    // Handle drag and drop
     uploadContainer.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadContainer.classList.add('border-primary');
@@ -28,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     uploadContainer.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadContainer.classList.remove('border-primary');
-        
         const files = e.dataTransfer.files;
         if (files.length) {
             fileInput.files = files;
@@ -36,27 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle file input change
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length) {
             handleFileUpload(e.target.files[0]);
         }
     });
 
-    // Handle analyze button click
     if (analyzeButton) {
         analyzeButton.addEventListener('click', () => {
             if (currentData) {
                 analyzeButton.disabled = true;
                 analyzeButton.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>Analyzing...';
-                
+
                 try {
                     processStockData(currentData.headers, currentData.rows);
                     showSuccess('Data analyzed successfully!');
-                    
-                    // Navigate to inventory section and show the first tab
                     document.querySelector('a[href="#inventory-section"]').click();
-                    document.querySelector('.tab[data-tab="site"]').click();
+                    document.querySelector('.tab[data-tab="ok"]').click();
                 } catch (error) {
                     showError('Error analyzing data: ' + error.message);
                 } finally {
@@ -67,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Process uploaded file
     function handleFileUpload(file) {
         if (!validateFile(file)) {
             showError('Please upload a valid Excel file (.xlsx or .xls)');
@@ -76,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         showLoading(true);
         const reader = new FileReader();
-        
+
         reader.onload = function(e) {
             try {
                 const data = new Uint8Array(e.target.result);
@@ -92,11 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 processAndPreviewData(jsonData);
                 showSuccess('File processed successfully!');
-                
-                // Enable analyze button
-                if (analyzeButton) {
-                    analyzeButton.disabled = false;
-                }
+                if (analyzeButton) analyzeButton.disabled = false;
+
             } catch (error) {
                 showError('Error processing the Excel file: ' + error.message);
             } finally {
@@ -112,36 +106,27 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsArrayBuffer(file);
     }
 
-    // Show/hide loading indicator
     function showLoading(show) {
-        if (show) {
-            loadingIndicator.classList.remove('hidden');
-            uploadContainer.classList.add('uploading');
-        } else {
-            loadingIndicator.classList.add('hidden');
-            uploadContainer.classList.remove('uploading');
-        }
+        loadingIndicator.classList.toggle('hidden', !show);
+        uploadContainer.classList.toggle('uploading', show);
     }
 
-    // Show success message
     function showSuccess(message) {
-        const successAlert = document.createElement('div');
-        successAlert.className = 'success-alert';
-        successAlert.textContent = message;
-        document.body.appendChild(successAlert);
-        setTimeout(() => successAlert.remove(), 3000);
+        const alert = document.createElement('div');
+        alert.className = 'success-alert';
+        alert.textContent = message;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 3000);
     }
 
-    // Show error message
     function showError(message) {
-        const errorAlert = document.createElement('div');
-        errorAlert.className = 'error-alert';
-        errorAlert.textContent = message;
-        document.body.appendChild(errorAlert);
-        setTimeout(() => errorAlert.remove(), 3000);
+        const alert = document.createElement('div');
+        alert.className = 'error-alert';
+        alert.textContent = message;
+        document.body.appendChild(alert);
+        setTimeout(() => alert.remove(), 3000);
     }
 
-    // Validate file type
     function validateFile(file) {
         const validTypes = [
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -150,22 +135,17 @@ document.addEventListener('DOMContentLoaded', function() {
         return validTypes.includes(file.type);
     }
 
-    // Process and display preview
     function processAndPreviewData(jsonData) {
         const headers = jsonData[0];
         const rows = jsonData.slice(1);
-
-        // Store current data for analyze button
         currentData = { headers, rows };
 
-        // Create table header
         let tableHTML = '<thead><tr>';
         headers.forEach(header => {
             tableHTML += `<th>${header}</th>`;
         });
         tableHTML += '</tr></thead><tbody>';
 
-        // Create table rows (limit to first 10 rows for preview)
         const previewRows = rows.slice(0, 10);
         previewRows.forEach(row => {
             tableHTML += '<tr>';
@@ -176,91 +156,83 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         tableHTML += '</tbody>';
 
-        // Display preview
         previewTable.innerHTML = tableHTML;
         previewSection.classList.remove('hidden');
 
-        // Add row count information
-        const rowCountInfo = document.createElement('p');
-        rowCountInfo.className = 'text-sm text-gray-600 mt-2';
-        rowCountInfo.textContent = `Showing ${previewRows.length} of ${rows.length} rows`;
-        previewSection.appendChild(rowCountInfo);
+        const info = document.createElement('p');
+        info.className = 'text-sm text-gray-600 mt-2';
+        info.textContent = `Showing ${previewRows.length} of ${rows.length} rows`;
+        previewSection.appendChild(info);
     }
 
-    // Process stock data
-    function processStockData(headers, rows) {
-        // Map headers to standardized field names
-        const headerMap = createHeaderMap(headers);
+    function createHeaderMap(headers) {
+        const mapping = {
+            'NPP': 'npp',
+            'TAHUN': 'tahun',
+            'KATEGORI': 'kategori',
+            'WP': 'wp',
+            'PPB': 'ppb',
+            'SBU': 'sbu',
+            'AREA': 'area',
+            'PELANGGAN': 'pelanggan',
+            'PROYEK': 'proyek',
+            'TYPE': 'type',
+            'UMUR STOK': 'umur_stok',
+            'RANGE UMUR': 'range_umur',
+            'KETERANGAN': 'keterangan'
+        };
 
-        // Convert rows to objects using header mapping
+        headers.forEach(h => {
+            const upper = h.trim().toUpperCase();
+            if (!mapping[upper]) mapping[upper] = h.toLowerCase().replace(/\s+/g, '_');
+        });
+
+        return mapping;
+    }
+
+    function processStockData(headers, rows) {
+        const headerMap = createHeaderMap(headers);
         const data = rows.map(row => {
             const obj = {};
-            headers.forEach((header, index) => {
-                const standardField = headerMap[header] || header;
-                obj[standardField] = row[index];
+            headers.forEach((header, i) => {
+                const key = headerMap[header] || header;
+                obj[key] = row[i];
             });
             return obj;
         });
 
-        // Categorize data by stock type
-        const categorizedData = categorizeStockData(data);
-
-        // Store processed data and update visualizations
-        Object.entries(categorizedData).forEach(([type, typeData]) => {
-            const processedData = {
-                ...calculateMetrics(typeData),
-                sbuData: processChartData(typeData, 'sbu'),
-                pbbData: processChartData(typeData, 'pbb'),
-                yearData: processChartData(typeData, 'tahun')
-            };
-            storeData(type, processedData);
-        });
-    }
-
-    // Create header mapping
-    function createHeaderMap(headers) {
-        // Map various possible header names to standardized fields
-        const mapping = {
-            'SBU': 'sbu',
-            'PBB': 'pbb',
-            'Tahun': 'tahun',
-            'Jumlah Stok': 'jumlah_stok',
-            'Saldo': 'saldo',
-            'Umur Stok': 'umur_stok',
-            'Tipe Stok': 'tipe_stok'
-        };
-
-        const headerMap = {};
-        headers.forEach(header => {
-            headerMap[header] = mapping[header] || header.toLowerCase().replace(/\s+/g, '_');
-        });
-
-        return headerMap;
-    }
-
-    // Categorize stock data
-    function categorizeStockData(data) {
         const categories = {
-            site: [],
-            pabrik: [],
+            ok: [],
+            spprb: [],
+            produksi: [],
+            distribusi: [],
+            lancar: [],
             bebas: [],
-            titipan: []
+            'titipan-percepatan': [],
+            'titipan-murni': []
         };
 
         data.forEach(item => {
-            const stockType = (item.tipe_stok || '').toLowerCase();
-            
-            if (stockType.includes('site')) {
-                categories.site.push(item);
-            } else if (stockType.includes('pabrik')) {
-                categories.pabrik.push(item);
-            } else if (stockType.includes('bebas')) {
-                categories.bebas.push(item);
-            } else if (stockType.includes('titipan')) {
-                categories.titipan.push(item);
-            }
+            const kategori = (item.kategori || item.type || '').toLowerCase();
+
+            if (kategori.includes('ok')) categories.ok.push(item);
+            else if (kategori.includes('spprb')) categories.spprb.push(item);
+            else if (kategori.includes('produksi')) categories.produksi.push(item);
+            else if (kategori.includes('distribusi')) categories.distribusi.push(item);
+            else if (kategori.includes('lancar')) categories.lancar.push(item);
+            else if (kategori.includes('bebas')) categories.bebas.push(item);
+            else if (kategori.includes('titipan percepatan')) categories['titipan-percepatan'].push(item);
+            else if (kategori.includes('titipan murni')) categories['titipan-murni'].push(item);
         });
 
-        return categories;
+        Object.entries(categories).forEach(([tab, items]) => {
+            processedStockDataByTab[tab] = items;
+            updateCharts(tab, items);
+        });
+    }
+
+    function updateCharts(tab, items) {
+        console.log(`Updating charts for ${tab} with`, items.length, 'items');
+        // TODO: Implement Chart.js logic here based on tab and items
     }
 });

@@ -11,14 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize dashboard
 function initializeDashboard() {
-    // Show inventory section by default
-    showSection('inventory-section');
-    
-    // Set initial tab
-    switchTab('site');
-    
-    // Initialize charts
-    initializeCharts();
+    showSection('inventory-section');  // Show default section
+    switchTab('site');                 // Set default tab
+    initializeCharts();               // Init charts
 }
 
 // Setup event listeners
@@ -46,7 +41,6 @@ function setupEventListeners() {
                 const sectionId = href.replace('#', '');
                 showSection(sectionId);
                 
-                // Update active state
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
             }
@@ -69,8 +63,7 @@ function handleInitialNavigation() {
     if (hash) {
         const sectionId = hash.substring(1);
         showSection(sectionId);
-        
-        // Update active nav link
+
         const navLink = document.querySelector(`.nav-link[href="${hash}"]`);
         if (navLink) {
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
@@ -81,23 +74,19 @@ function handleInitialNavigation() {
 
 // Section visibility management
 function showSection(sectionId) {
-    // Hide all sections
     document.querySelectorAll('.section').forEach(section => {
         section.classList.add('hidden');
     });
 
-    // Show requested section
     const section = document.getElementById(sectionId);
     if (section) {
         section.classList.remove('hidden');
         currentSection = sectionId;
 
-        // Initialize charts if showing inventory section
         if (sectionId === 'inventory-section') {
             initializeCharts();
         }
 
-        // Update URL hash without scrolling
         const scrollPosition = window.scrollY;
         window.location.hash = sectionId;
         window.scrollTo(0, scrollPosition);
@@ -106,14 +95,21 @@ function showSection(sectionId) {
 
 // Tab switching functionality
 function switchTab(tabName) {
-    // Update active tab styling
+    // Set active tab
     document.querySelectorAll('.tab').forEach(tab => {
-        if (tab.getAttribute('data-tab') === tabName) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
+        tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName);
     });
+
+    // Hide all tab content
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+
+    // Show current tab content
+    const activeContent = document.getElementById(`tab-${tabName}`);
+    if (activeContent) {
+        activeContent.classList.remove('hidden');
+    }
 
     currentTab = tabName;
     updateDashboardData(tabName);
@@ -121,19 +117,16 @@ function switchTab(tabName) {
 
 // Update dashboard data based on selected tab
 function updateDashboardData(tabName) {
-    // Get stored data for the selected tab
     const data = getStoredData(tabName);
     if (!data) {
         resetDashboardData();
         return;
     }
 
-    // Update metrics
     document.getElementById('total-stock').textContent = data.totalStock || '0';
     document.getElementById('current-balance').textContent = data.currentBalance || '0';
     document.getElementById('avg-age').textContent = data.averageAge || '0';
 
-    // Update charts
     updateCharts(data);
 }
 
@@ -143,7 +136,6 @@ function resetDashboardData() {
     document.getElementById('current-balance').textContent = '0';
     document.getElementById('avg-age').textContent = '0';
 
-    // Reset charts to empty state
     updateCharts({
         sbuData: { labels: [], values: [] },
         pbbData: { labels: [], values: [] },
