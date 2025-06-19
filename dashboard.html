@@ -1,156 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Wika Beton</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Wika Beton</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-50">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar">
-            <div class="p-4 flex justify-end">
-                <button id="toggleSidebar" class="text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="p-4 flex justify-end">
+        <button id="toggleSidebar" class="text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+      <nav class="mt-8 flex flex-col space-y-2">
+        <button class="nav-link active" data-target="inventory-section">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+          Inventory Management
+        </button>
+        <button class="nav-link" data-target="upload-section">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          Upload Data
+        </button>
+        <a href="index.html" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8">
+      <!-- Inventory Section -->
+      <section id="inventory-section" class="section">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">Inventory Management</h1>
+        <div class="tab-container flex mb-8">
+          <button class="tab active" data-tab="ok">Monitoring OK</button>
+          <button class="tab" data-tab="spprb">Monitoring SPPRB</button>
+          <button class="tab" data-tab="produksi">Monitoring Produksi</button>
+          <button class="tab" data-tab="distribusi">Monitoring Distribusi</button>
+          <button class="tab" data-tab="lancar">Monitoring Stok Lancar</button>
+          <button class="tab" data-tab="bebas">Monitoring Stok Bebas</button>
+          <button class="tab" data-tab="titipan-percepatan">Monitoring Stok Titipan Percepatan</button>
+          <button class="tab" data-tab="titipan-murni">Monitoring Stok Titipan Murni</button>
+        </div>
+
+        <div id="tab-contents">
+          <!-- TAB OK -->
+          <div class="tab-content" id="ok">
+            <h2 class="text-xl font-bold mb-4">Monitoring OK</h2>
+            <canvas id="chart-ok-sbu" class="mb-6"></canvas>
+            <canvas id="chart-ok-kategori" class="mb-6"></canvas>
+            <canvas id="chart-ok-tren" class="mb-6"></canvas>
+            <canvas id="chart-ok-range" class="mb-6"></canvas>
+          </div>
+          <!-- TAB SPPRB -->
+          <div class="tab-content hidden" id="spprb">
+            <h2 class="text-xl font-bold mb-4">Monitoring SPPRB</h2>
+            <canvas id="chart-spprb-sbu" class="mb-6"></canvas>
+            <canvas id="chart-spprb-ppb" class="mb-6"></canvas>
+          </div>
+          <!-- TAB PRODUKSI -->
+          <div class="tab-content hidden" id="produksi">
+            <h2 class="text-xl font-bold mb-4">Monitoring Produksi</h2>
+            <canvas id="chart-produksi-total" class="mb-6"></canvas>
+          </div>
+          <!-- TAB DISTRIBUSI -->
+          <div class="tab-content hidden" id="distribusi">
+            <h2 class="text-xl font-bold mb-4">Monitoring Distribusi</h2>
+            <canvas id="chart-distribusi-saldo" class="mb-6"></canvas>
+            <canvas id="chart-distribusi-mutasi" class="mb-6"></canvas>
+          </div>
+          <!-- TAB STOK LANCAR -->
+          <div class="tab-content hidden" id="lancar">
+            <h2 class="text-xl font-bold mb-4">Monitoring Stok Lancar</h2>
+            <canvas id="chart-lancar-tahun" class="mb-6"></canvas>
+            <canvas id="chart-lancar-sbu" class="mb-6"></canvas>
+          </div>
+          <!-- TAB STOK BEBAS -->
+          <div class="tab-content hidden" id="bebas">
+            <h2 class="text-xl font-bold mb-4">Monitoring Stok Bebas</h2>
+            <canvas id="chart-bebas-proyek" class="mb-6"></canvas>
+            <canvas id="chart-bebas-area" class="mb-6"></canvas>
+          </div>
+          <!-- TAB TITIPAN PERCEPATAN -->
+          <div class="tab-content hidden" id="titipan-percepatan">
+            <h2 class="text-xl font-bold mb-4">Monitoring Titipan Percepatan</h2>
+            <canvas id="chart-percepatan-sbu" class="mb-6"></canvas>
+            <canvas id="chart-percepatan-mutasi" class="mb-6"></canvas>
+          </div>
+          <!-- TAB TITIPAN MURNI -->
+          <div class="tab-content hidden" id="titipan-murni">
+            <h2 class="text-xl font-bold mb-4">Monitoring Titipan Murni</h2>
+            <canvas id="chart-murni-ppb" class="mb-6"></canvas>
+            <canvas id="chart-murni-mutasi" class="mb-6"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Upload Section -->
+      <section id="upload-section" class="section hidden">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">Upload Data</h1>
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+          <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden">
+          <label for="excelFile" class="cursor-pointer">
+            <div class="text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
+              <p class="text-xs text-gray-500">Excel files only (.xlsx, .xls)</p>
             </div>
-            <nav class="mt-8">
-                <a href="#inventory-section" class="nav-link active">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                    <span>Inventory Management</span>
-                </a>
-                <a href="#upload-section" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span>Upload Data</span>
-                </a>
-                <a href="index.html" class="nav-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Logout</span>
-                </a>
-            </nav>
-        </aside>
+          </label>
+          <div id="preview-section" class="mt-8 hidden">
+            <h2 class="text-lg font-semibold mb-4">Data Preview</h2>
+            <div class="overflow-x-auto">
+              <table id="preview-table" class="preview-table"></table>
+            </div>
+            <div class="mt-6 flex justify-center">
+              <button id="analyzeButton" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                Analyze Data
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-8">
-            <section id="inventory-section" class="section">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-800">Inventory Management</h1>
-                </div>
+  <script src="js/main.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/upload.js"></script>
 
-                <!-- Tabs -->
-                <div class="tab-container flex mb-8">
-                    <button class="tab active" data-tab="ok">Monitoring OK</button>
-                    <button class="tab" data-tab="spprb">Monitoring SPPRB</button>
-                    <button class="tab" data-tab="produksi">Monitoring Produksi</button>
-                    <button class="tab" data-tab="distribusi">Monitoring Distribusi</button>
-                    <button class="tab" data-tab="lancar">Monitoring Stok Lancar</button>
-                    <button class="tab" data-tab="bebas">Monitoring Stok Bebas</button>
-                    <button class="tab" data-tab="titipan-percepatan">Monitoring Stok Titipan Percepatan</button>
-                    <button class="tab" data-tab="titipan-murni">Monitoring Stok Titipan Murni</button>
-                </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Tab switching
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.getAttribute('data-tab');
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.add('hidden'));
+          tab.classList.add('active');
+          document.getElementById(target).classList.remove('hidden');
+        });
+      });
 
-                <!-- Tabs Content -->
-                <div id="tab-contents">
-                    <div class="tab-content" id="ok">
-                        <h2 class="text-xl font-bold mb-4">Monitoring OK</h2>
-                        <canvas id="chart-ok-sbu"></canvas>
-                        <canvas id="chart-ok-ppb"></canvas>
-                        <canvas id="chart-ok-tahun"></canvas>
-                        <canvas id="chart-ok-tren"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="spprb">
-                        <h2 class="text-xl font-bold mb-4">Monitoring SPPRB</h2>
-                        <canvas id="chart-spprb-sbu"></canvas>
-                        <canvas id="chart-spprb-ppb"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="produksi">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Produksi</h2>
-                        <canvas id="chart-produksi"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="distribusi">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Distribusi</h2>
-                        <canvas id="chart-distribusi-saldo"></canvas>
-                        <canvas id="chart-distribusi-mutasi"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="lancar">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Stok Lancar</h2>
-                        <canvas id="chart-lancar-tahun"></canvas>
-                        <canvas id="chart-lancar-sbu"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="bebas">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Stok Bebas</h2>
-                        <canvas id="chart-bebas-proyek"></canvas>
-                        <canvas id="chart-bebas-area"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="titipan-percepatan">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Titipan Percepatan</h2>
-                        <canvas id="chart-percepatan-sbu"></canvas>
-                        <canvas id="chart-percepatan-mutasi"></canvas>
-                    </div>
-
-                    <div class="tab-content hidden" id="titipan-murni">
-                        <h2 class="text-xl font-bold mb-4">Monitoring Titipan Murni</h2>
-                        <canvas id="chart-murni-ppb"></canvas>
-                        <canvas id="chart-murni-mutasi"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Upload Section -->
-            <section id="upload-section" class="section hidden">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-semibold text-gray-800">Upload Data</h1>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <div class="upload-container">
-                        <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden">
-                        <label for="excelFile" class="cursor-pointer">
-                            <div class="text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <p class="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
-                                <p class="text-xs text-gray-500">Excel files only (.xlsx, .xls)</p>
-                            </div>
-                        </label>
-                    </div>
-                    <div id="preview-section" class="mt-8 hidden">
-                        <h2 class="text-lg font-semibold mb-4">Data Preview</h2>
-                        <div class="overflow-x-auto">
-                            <table id="preview-table" class="preview-table"></table>
-                        </div>
-                        <div class="mt-6 flex justify-center">
-                            <button id="analyzeButton" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                Analyze Data
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script src="js/main.js"></script>
-    <script src="js/charts.js"></script>
-    <script src="js/upload.js"></script>
+      // Sidebar section switching
+      const navLinks = document.querySelectorAll('.nav-link');
+      const sections = document.querySelectorAll('.section');
+      navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          const target = link.dataset.target;
+          if (!target) return; // Skip <a href="index.html"> logout
+          e.preventDefault();
+          sections.forEach(section => section.classList.add('hidden'));
+          document.getElementById(target).classList.remove('hidden');
+          navLinks.forEach(nav => nav.classList.remove('active'));
+          link.classList.add('active');
+        });
+      });
+    });
+  </script>
 </body>
 </html>
