@@ -95,7 +95,7 @@ body {
 .tab.active {
     border-bottom: 2px solid var(--primary-color);
     color: var(--primary-color);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 /* Card Styles */
