@@ -1,8 +1,4 @@
-// File: upload.js
-
-// Global cache to store processed data
-const processedStockDataByTab = {};
-
+// File upload handling
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('excelFile');
     const previewSection = document.getElementById('preview-section');
@@ -19,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     uploadContainer.appendChild(loadingIndicator);
 
+    // Drag and Drop
     uploadContainer.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadContainer.classList.add('border-primary');
@@ -31,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     uploadContainer.addEventListener('drop', (e) => {
         e.preventDefault();
         uploadContainer.classList.remove('border-primary');
+        
         const files = e.dataTransfer.files;
         if (files.length) {
             fileInput.files = files;
@@ -38,23 +36,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Manual File Input
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length) {
             handleFileUpload(e.target.files[0]);
         }
     });
 
+    // Analyze button click
     if (analyzeButton) {
         analyzeButton.addEventListener('click', () => {
             if (currentData) {
                 analyzeButton.disabled = true;
                 analyzeButton.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>Analyzing...';
-
+                
                 try {
                     processStockData(currentData.headers, currentData.rows);
                     showSuccess('Data analyzed successfully!');
-                    document.querySelector('a[href="#inventory-section"]').click();
-                    document.querySelector('.tab[data-tab="ok"]').click();
+                    
+                    const inventoryLink = document.querySelector('a[href="#inventory-section"]');
+                    const siteTab = document.querySelector('.tab[data-tab="ok"]');
+                    
+                    if (inventoryLink) inventoryLink.click();
+                    else console.error('Link ke #inventory-section tidak ditemukan');
+                    
+                    if (siteTab) siteTab.click();
+                    else console.error('Tab dengan data-tab="ok" tidak ditemukan');                                      
                 } catch (error) {
                     showError('Error analyzing data: ' + error.message);
                 } finally {
@@ -65,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Read and parse file
     function handleFileUpload(file) {
         if (!validateFile(file)) {
             showError('Please upload a valid Excel file (.xlsx or .xls)');
@@ -73,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         showLoading(true);
         const reader = new FileReader();
-
+        
         reader.onload = function(e) {
             try {
                 const data = new Uint8Array(e.target.result);
@@ -89,8 +97,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 processAndPreviewData(jsonData);
                 showSuccess('File processed successfully!');
-                if (analyzeButton) analyzeButton.disabled = false;
-
+                if (analyzeButton) {
+                    analyzeButton.disabled = false;
+                }
             } catch (error) {
                 showError('Error processing the Excel file: ' + error.message);
             } finally {
@@ -107,24 +116,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function showLoading(show) {
-        loadingIndicator.classList.toggle('hidden', !show);
-        uploadContainer.classList.toggle('uploading', show);
+        if (show) {
+            loadingIndicator.classList.remove('hidden');
+            uploadContainer.classList.add('uploading');
+        } else {
+            loadingIndicator.classList.add('hidden');
+            uploadContainer.classList.remove('uploading');
+        }
     }
 
     function showSuccess(message) {
-        const alert = document.createElement('div');
-        alert.className = 'success-alert';
-        alert.textContent = message;
-        document.body.appendChild(alert);
-        setTimeout(() => alert.remove(), 3000);
+        const successAlert = document.createElement('div');
+        successAlert.className = 'success-alert';
+        successAlert.textContent = message;
+        document.body.appendChild(successAlert);
+        setTimeout(() => successAlert.remove(), 3000);
     }
 
     function showError(message) {
-        const alert = document.createElement('div');
-        alert.className = 'error-alert';
-        alert.textContent = message;
-        document.body.appendChild(alert);
-        setTimeout(() => alert.remove(), 3000);
+        const errorAlert = document.createElement('div');
+        errorAlert.className = 'error-alert';
+        errorAlert.textContent = message;
+        document.body.appendChild(errorAlert);
+        setTimeout(() => errorAlert.remove(), 3000);
     }
 
     function validateFile(file) {
@@ -138,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function processAndPreviewData(jsonData) {
         const headers = jsonData[0];
         const rows = jsonData.slice(1);
+
         currentData = { headers, rows };
 
         let tableHTML = '<thead><tr>';
@@ -159,80 +174,94 @@ document.addEventListener('DOMContentLoaded', function() {
         previewTable.innerHTML = tableHTML;
         previewSection.classList.remove('hidden');
 
-        const info = document.createElement('p');
-        info.className = 'text-sm text-gray-600 mt-2';
-        info.textContent = `Showing ${previewRows.length} of ${rows.length} rows`;
-        previewSection.appendChild(info);
+        const rowCountInfo = document.createElement('p');
+        rowCountInfo.className = 'text-sm text-gray-600 mt-2';
+        rowCountInfo.textContent = `Showing ${previewRows.length} of ${rows.length} rows`;
+        previewSection.appendChild(rowCountInfo);
     }
 
-    function createHeaderMap(headers) {
-        const mapping = {
-            'NPP': 'npp',
-            'TAHUN': 'tahun',
-            'KATEGORI': 'kategori',
-            'WP': 'wp',
-            'PPB': 'ppb',
-            'SBU': 'sbu',
-            'AREA': 'area',
-            'PELANGGAN': 'pelanggan',
-            'PROYEK': 'proyek',
-            'TYPE': 'type',
-            'UMUR STOK': 'umur_stok',
-            'RANGE UMUR': 'range_umur',
-            'KETERANGAN': 'keterangan'
-        };
-
-        headers.forEach(h => {
-            const upper = h.trim().toUpperCase();
-            if (!mapping[upper]) mapping[upper] = h.toLowerCase().replace(/\s+/g, '_');
-        });
-
-        return mapping;
-    }
-
+    // Process stock data: mapping semua header dan categorizing
     function processStockData(headers, rows) {
         const headerMap = createHeaderMap(headers);
+
         const data = rows.map(row => {
             const obj = {};
-            headers.forEach((header, i) => {
-                const key = headerMap[header] || header;
-                obj[key] = row[i];
+            headers.forEach((header, index) => {
+                const standardField = headerMap[header] || header;
+                obj[standardField] = row[index];
             });
             return obj;
         });
 
-        const categories = {
-            ok: [],
-            spprb: [],
-            produksi: [],
-            distribusi: [],
-            lancar: [],
-            bebas: [],
-            'titipan-percepatan': [],
-            'titipan-murni': []
-        };
+        const categorizedData = categorizeStockData(data);
 
-        data.forEach(item => {
-            const kategori = (item.kategori || item.type || '').toLowerCase();
-
-            if (kategori.includes('ok')) categories.ok.push(item);
-            else if (kategori.includes('spprb')) categories.spprb.push(item);
-            else if (kategori.includes('produksi')) categories.produksi.push(item);
-            else if (kategori.includes('distribusi')) categories.distribusi.push(item);
-            else if (kategori.includes('lancar')) categories.lancar.push(item);
-            else if (kategori.includes('bebas')) categories.bebas.push(item);
-            else if (kategori.includes('titipan percepatan')) categories['titipan-percepatan'].push(item);
-            else if (kategori.includes('titipan murni')) categories['titipan-murni'].push(item);
-        });
-
-        Object.entries(categories).forEach(([tab, items]) => {
-            processedStockDataByTab[tab] = items;
-            updateCharts(tab, items);
+        Object.entries(categorizedData).forEach(([type, typeData]) => {
+            storeData(type, typeData);        // simpan data mentah
+            updateCharts(type, typeData);     // update chart sesuai tab
         });
     }
 
-    function updateCharts(tab, items) {
-        console.log(`Updating charts for ${tab} with`, items.length, 'items');
-        // TODO: Implement Chart.js logic here based on tab and items
+    // Mapping semua header: lowercase dan ganti spasi jadi underscore
+    function createHeaderMap(headers) {
+        const headerMap = {};
+        headers.forEach(header => {
+            headerMap[header] = header.toLowerCase().trim().replace(/\s+/g, '_');
+        });
+        return headerMap;
+    }
+
+    // Kategorisasi berdasarkan isi field tipe_stok
+    function categorizeStockData(data) {
+        const categories = {
+            ok: [], spprb: [], produksi: [], distribusi: [], lancar: [],
+            bebas: [], titipan_percepatan: [], titipan_murni: [],
+            titipan_op: [], titipan_ppb: [], site: []
+        };
+
+        data.forEach(item => {
+            const stockType = (item.tipe_stok || '').toLowerCase();
+
+            if (stockType.includes('ok')) categories.ok.push(item);
+            else if (stockType.includes('spprb')) categories.spprb.push(item);
+            else if (stockType.includes('produksi')) categories.produksi.push(item);
+            else if (stockType.includes('distribusi')) categories.distribusi.push(item);
+            else if (stockType.includes('lancar')) categories.lancar.push(item);
+            else if (stockType.includes('bebas')) categories.bebas.push(item);
+            else if (stockType.includes('titipan-percepatan')) categories.titipan_percepatan.push(item);
+            else if (stockType.includes('titipan-murni')) categories.titipan_murni.push(item);
+            else if (stockType.includes('op')) categories.titipan_op.push(item);
+            else if (stockType.includes('ppb')) categories.titipan_ppb.push(item);
+            else if (stockType.includes('site')) categories.site.push(item);
+        });
+
+        return categories;
+    }
+
+    // Update charts per kategori stok
+    function updateCharts(type, data) {
+        switch (type) {
+            case 'ok':
+                renderOKCharts(data); break;
+            case 'spprb':
+                renderSPPRBCharts(data); break;
+            case 'produksi':
+                renderProduksiCharts(data); break;
+            case 'distribusi':
+                renderDistribusiCharts(data); break;
+            case 'lancar':
+                renderStokLancarCharts(data); break;
+            case 'bebas':
+                renderStokBebasCharts(data); break;
+            case 'titipan_percepatan':
+                renderTitipanPercepatanCharts(data); break;
+            case 'titipan_murni':
+                renderTitipanMurniCharts(data); break;
+            case 'titipan_op':
+                renderTitipanOPCharts(data); break;
+            case 'titipan_ppb':
+                renderTitipanPPBCharts(data); break;
+            case 'site':
+                renderSiteCharts(data); break;
+        }
     }
 });
