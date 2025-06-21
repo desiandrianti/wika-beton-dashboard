@@ -1,192 +1,194 @@
-// ==== 📁 FILE: charts.js ====
-console.log("📈 charts.js loaded");
+// Global state
+let currentTab = 'ok';  // default tab
+let currentSection = 'inventory-section';
 
-window.chartInstances = {}; // Global chart instance
-
-function initializeCharts() {
-    function createChart(ctx, label, defaultData = [0]) {
-        return new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Default Label'],
-                datasets: [{
-                    label: label,
-                    data: defaultData,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-    }
-
-    function initChart(chartId, label) {
-        const ctx = document.getElementById(chartId);
-        if (ctx) {
-            window.chartInstances[chartId] = createChart(ctx, label);
-            addEmptyMessage(ctx);
-        }
-    }
-
-    // Inisialisasi semua chart
-    [
-        ['chart-ok-sbu', 'Stok OK SBU'],
-        ['chart-spprb-sbu', 'Stok SPPRB SBU'],
-        ['chart-produksi', 'Stok Produksi'],
-        ['chart-distribusi-saldo', 'Distribusi Saldo'],
-        ['chart-lancar-tahun', 'Lancar per Tahun'],
-        ['chart-bebas-proyek', 'Bebas per Proyek'],
-        ['chart-percepatan-sbu', 'Titipan Percepatan per SBU'],
-        ['chart-murni-ppb', 'Titipan Murni per PPB'],
-        ['chart-op-ppb', 'OP per PPB'],
-        ['chart-ppb-ppb', 'PPB - PPB'],
-        ['chart-site-ppb', 'Site - PPB']
-    ].forEach(([id, label]) => initChart(id, label));
-}
-
-function addEmptyMessage(canvasElement) {
-    const container = canvasElement.parentNode;
-    const message = document.createElement('div');
-    message.className = 'empty-chart-message';
-    message.textContent = 'Data kosong atau belum dimuat';
-    container.insertBefore(message, canvasElement.nextSibling);
-}
-
-document.addEventListener('DOMContentLoaded', initializeCharts);
-
-
-// ==== 📁 FILE: upload.js ====
-console.log("📥 upload.js loaded");
-
+// DOM ready
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("📦 upload.js masuk ke DOM");
+    initializeDashboard();
+    setupEventListeners();
+    handleInitialNavigation();
+});
 
-    const excelFileInput = document.getElementById('excelFile');
-    const previewSection = document.getElementById('preview-section');
-    const previewTable = document.getElementById('preview-table');
-    const analyzeButton = document.getElementById('analyzeButton');
+// Initial setup
+function initializeDashboard() {
+    showSection('inventory-section');
+    switchTab(currentTab);
 
-    const COLUMN_MAPPING = {
-        'chart-ok-sbu': 11,
-        'chart-spprb-sbu': 13,
-        'chart-produksi': 15,
-        'chart-distribusi-saldo': 17,
-        'chart-lancar-tahun': 19,
-        'chart-bebas-proyek': 21,
-        'chart-percepatan-sbu': 23,
-        'chart-murni-ppb': 25,
-        'chart-op-ppb': 27,
-        'chart-ppb-ppb': 29,
-        'chart-site-ppb': 31
-    };
-
-    excelFileInput.addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                if (jsonData.length < 2) throw new Error("No data found in the sheet");
-
-                displayPreview(jsonData);
-            } catch (error) {
-                console.error("❌ Error processing file:", error);
-                alert("Error processing file: " + error.message);
-            }
-        };
-        reader.readAsArrayBuffer(file);
-    });
-
-    function displayPreview(data) {
-        previewTable.innerHTML = '';
-
-        const headerRow = document.createElement('tr');
-        headerRow.className = 'bg-gray-100';
-        data[0].forEach(header => {
-            const th = document.createElement('th');
-            th.className = 'px-4 py-2 border';
-            th.textContent = header || 'Column';
-            headerRow.appendChild(th);
-        });
-        previewTable.appendChild(headerRow);
-
-        for (let i = 1; i < data.length; i++) {
-            const row = document.createElement('tr');
-            data[i].forEach((cell) => {
-                const td = document.createElement('td');
-                td.className = 'px-4 py-2 border';
-                td.textContent = cell;
-                row.appendChild(td);
-            });
-            previewTable.appendChild(row);
-        }
-
-        previewSection.classList.remove('hidden');
-        analyzeButton.disabled = false;
+    // Pastikan fungsi ini sudah didefinisikan di upload.js atau charts.js dan sudah dimuat
+    if (typeof initializeCharts === 'function') {
+        initializeCharts();
+    } else {
+        console.warn("⚠️ initializeCharts() belum didefinisikan.");
     }
+}
 
-    analyzeButton.addEventListener('click', function () {
-        try {
-            const data = getDataFromPreview();
-            if (!data || data.length < 2) throw new Error("No valid data to analyze");
+// All event listeners
+function setupEventListeners() {
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const toggleButton = document.getElementById('toggleSidebar');
 
-            updateAllCharts(data);
-            localStorage.setItem('wika-latest-data', JSON.stringify(data));
-            alert("Data successfully analyzed and charts updated!");
-        } catch (error) {
-            console.error("❌ Error in analysis:", error);
-            alert("Analysis error: " + error.message);
-        }
-    });
-
-    function getDataFromPreview() {
-        const rows = Array.from(previewTable.querySelectorAll('tr'));
-        return rows.map(row => Array.from(row.querySelectorAll('td, th')).map(cell => cell.textContent));
-    }
-
-    function updateAllCharts(data) {
-        const chartData = {};
-        Object.keys(COLUMN_MAPPING).forEach(chartId => chartData[chartId] = []);
-
-        for (let i = 1; i < data.length; i++) {
-            const row = data[i];
-            Object.entries(COLUMN_MAPPING).forEach(([chartId, colIndex]) => {
-                if (row.length > colIndex) {
-                    const value = parseFloat(row[colIndex]) || 0;
-                    chartData[chartId].push(value);
-                }
+    if (toggleButton && sidebar) {
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            document.querySelectorAll('.nav-link span').forEach(span => {
+                span.classList.toggle('hidden');
             });
-        }
-
-        Object.entries(chartData).forEach(([chartId, values]) => {
-            const chart = window.chartInstances[chartId];
-            if (!chart) return;
-
-            const labels = Array.from({ length: values.length }, (_, i) => `Item ${i + 1}`);
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = values;
-            chart.update();
-
-            const messageElement = chart.canvas.nextElementSibling;
-            if (messageElement && messageElement.classList.contains('empty-chart-message')) {
-                const isEmpty = values.length === 0 || values.every(val => val === 0);
-                messageElement.style.display = isEmpty ? 'block' : 'none';
-            }
         });
     }
 
-    window.updateAllCharts = updateAllCharts; // Make available globally
+    // Sidebar nav link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const target = link.getAttribute('data-target');
+            if (!target) return;
+            e.preventDefault();
+
+            showSection(target);
+
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            switchTab(tabName);
+        });
+    });
+}
+
+// When URL changes (hash-based navigation)
+function handleInitialNavigation() {
+    const hash = window.location.hash;
+    if (hash) {
+        const sectionId = hash.substring(1);
+        showSection(sectionId);
+
+        const navLink = document.querySelector(`.nav-link[data-target="${sectionId}"]`);
+        if (navLink) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            navLink.classList.add('active');
+        }
+    }
+}
+
+// Show selected section only
+function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('hidden');
+    });
+
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.classList.remove('hidden');
+        currentSection = sectionId;
+
+        // Init chart on inventory
+        if (sectionId === 'inventory-section') {
+            if (typeof initializeCharts === 'function') {
+                initializeCharts();
+            }
+        }
+
+        const scrollPosition = window.scrollY;
+        window.location.hash = sectionId;
+        window.scrollTo(0, scrollPosition);
+    }
+}
+
+// Switch between tab contents
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName);
+    });
+
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+
+    const activeContent = document.getElementById(tabName);
+    if (activeContent) {
+        activeContent.classList.remove('hidden');
+    }
+
+    currentTab = tabName;
+    updateDashboardData(tabName);
+}
+
+// Update dashboard metrics
+function updateDashboardData(tabName) {
+    const data = getStoredData(tabName);
+    if (!data) {
+        resetDashboardData();
+        return;
+    }
+
+    // Update metrics
+    document.getElementById('total-stock')?.textContent = data.totalStock || '0';
+    document.getElementById('current-balance')?.textContent = data.currentBalance || '0';
+    document.getElementById('avg-age')?.textContent = data.averageAge || '0';
+
+    // Update charts
+    if (typeof updateCharts === 'function') {
+        updateCharts(tabName, data);
+    }
+}
+
+// Reset dashboard values
+function resetDashboardData() {
+    document.getElementById('total-stock')?.textContent = '0';
+    document.getElementById('current-balance')?.textContent = '0';
+    document.getElementById('avg-age')?.textContent = '0';
+
+    if (typeof updateCharts === 'function') {
+        updateCharts(currentTab, {
+            sbuData: { labels: [], values: [] },
+            pbbData: { labels: [], values: [] },
+            yearData: { labels: [], values: [] }
+        });
+    }
+}
+
+// Get local storage
+function getStoredData(tabName) {
+    const storedData = localStorage.getItem(`wika-data-${tabName}`);
+    return storedData ? JSON.parse(storedData) : null;
+}
+
+// Simpan ke local storage
+function storeData(tabName, data) {
+    localStorage.setItem(`wika-data-${tabName}`, JSON.stringify(data));
+    if (currentTab === tabName && currentSection === 'inventory-section') {
+        updateDashboardData(tabName);
+    }
+}
+
+// Global alert error
+function showError(message) {
+    const div = document.createElement('div');
+    div.className = 'error-alert';
+    div.textContent = message;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+
+// Global alert success
+function showSuccess(message) {
+    const div = document.createElement('div');
+    div.className = 'success-alert';
+    div.textContent = message;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 3000);
+}
+
+// Re-handle section if hash changes manually
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash;
+    if (hash) {
+        const sectionId = hash.substring(1);
+        showSection(sectionId);
+    }
 });
