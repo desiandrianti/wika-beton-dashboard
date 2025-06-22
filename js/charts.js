@@ -1,218 +1,74 @@
-// File: charts.js
-
-// Cache Chart.js instances
+// 📦 Cache untuk menyimpan instance chart agar bisa destroy jika diperbarui
 const chartInstances = {};
 
-function updateCharts(tab, items) {
-    switch (tab) {
-        case 'ok':
-            renderOKCharts(items);
-            break;
-        case 'spprb':
-            renderSPPRBCharts(items);
-            break;
-        case 'produksi':
-            renderProduksiCharts(items);
-            break;
-        case 'distribusi':
-            renderDistribusiCharts(items);
-            break;
-        case 'lancar':
-            renderLancarCharts(items);
-            break;
-        case 'bebas':
-            renderBebasCharts(items);
-            break;
-        case 'titipan-percepatan':
-            renderTitipanPercepatanCharts(items);
-            break;
-        case 'titipan-murni':
-            renderTitipanMurniCharts(items);
-            break;
-        case 'op':
-            renderOPCharts(items);
-            break;
-        case 'ppb':
-            renderPPBCharts(items);
-            break;
-        case 'site':
-            renderSiteCharts(items);
-            break;
-        default:
-            console.warn(`⚠️ No chart handler for tab "${tab}"`);
-    }
+// 🔧 Normalisasi key (misal 'RANGE UMUR' → 'range_umur')
+function normalizeKey(rawKey) {
+    return rawKey.toLowerCase().replace(/\s+/g, '_');
 }
 
-function initializeCharts() {
-    console.log("📊 initializeCharts() dipanggil - inisialisasi awal grafik");
-    const tabs = [
-        'ok', 'spprb', 'produksi', 'distribusi',
-        'lancar', 'bebas', 'titipan-percepatan', 'titipan-murni','op','ppb','site'
-    ];
-    tabs.forEach(tab => updateCharts(tab, [])); // Kosong dulu
-}
-
-// Contoh sederhana tiap render function:
-
-function renderOKCharts(items) {
-    renderBarChart('chart-ok-sbu', groupBy(items, 'sbu'));
-    renderBarChart('chart-ok-ppb', groupBy(items, 'ppb'));
-    renderLineChart('chart-ok-tren', groupBy(items, 'tahun'));
-    renderPieChart('chart-ok-range', groupBy(items, 'range_umur'));
-}
-
-function renderSPPRBCharts(items) {
-    renderBarChart('chart-spprb-sbu', groupBy(items, 'sbu'));
-    renderBarChart('chart-spprb-ppb', groupBy(items, 'ppb'));
-}
-
-function renderProduksiCharts(items) {
-    renderBarChart('chart-produksi-sbu', groupBy(items, 'sbu'));
-    renderBarChart('chart-produksi-ppb', groupBy(items, 'ppb'));
-}
-
-function renderDistribusiCharts(items) {
-    renderBarChart('chart-distribusi-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-distribusi-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-distribusi-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-distribusi-saldo', groupBy(items, 'range_umur'));
-}
-
-function renderLancarCharts(items) {
-    renderBarChart('chart-lancar-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-lancar-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-lancar-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-lancar-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderBebasCharts(items) {
-    renderBarChart('chart-bebas-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-bebas-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-bebas-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-bebas-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderTitipanPercepatanCharts(items) {
-    renderBarChart('chart-percepatan-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-percepatan-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-percepatan-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-percepatan-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderTitipanMurniCharts(items) {
-    renderBarChart('chart-murni-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-murni-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-murni-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-murni-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderOPCharts(items) {
-    renderBarChart('chart-op-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-op-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-op-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-op-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderPPBCharts(items) {
-    renderBarChart('chart-ppb-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-ppb-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-ppb-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-ppb-saldo', groupBy(items, 'range_umur'))
-}
-
-function renderSiteCharts(items) {
-    renderBarChart('chart-site-stok', groupBy(items, 'sbu'));
-    renderBarChart('chart-site-saldo', groupBy(items, 'sbu'));
-    renderBarChart('chart-site-stok', groupBy(items, 'range_umur'));
-    renderBarChart('chart-site-saldo', groupBy(items, 'range_umur'))
-}
-
-// Helper untuk group data
-function groupBy(items, key) {
+// 🔄 Group data berdasarkan key
+function groupBy(items, rawKey) {
+    const key = normalizeKey(rawKey);
     const map = {};
     items.forEach(item => {
-        const val = item[key] || 'Lainnya';
+        const val = item[key] ?? 'Lainnya';
         map[val] = (map[val] || 0) + 1;
     });
     return {
         labels: Object.keys(map),
-        values: Object.values(map)
+        values: Object.values(map),
+        label: `Jumlah per ${rawKey.toUpperCase()}`
     };
 }
 
-// Render Bar Chart
-function renderBarChart(canvasId, data) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
+const canvasId = `chart-${tab}-${key}`;
+const canvas = document.getElementById(canvasId);
 
-    if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
-
-    chartInstances[canvasId] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.labels,
-            datasets: [{
-                label: 'Jumlah',
-                data: data.values,
-                backgroundColor: '#3b82f6'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
+if (!canvas) {
+    console.warn(`⛔ Elemen ${canvasId} tidak ditemukan`);
+    return;
 }
 
-// Render Pie Chart
-function renderPieChart(canvasId, data) {
+const ctx = canvas.getContext("2d");
+
+// 🎨 Fungsi umum render chart
+function renderChart(canvasId, type, data, options = {}) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
 
     if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
-    chartInstances[canvasId] = new Chart(ctx, {
-        type: 'pie',
+    const config = {
+        type: type,
         data: {
             labels: data.labels,
             datasets: [{
+                label: data.label || 'Jumlah',
                 data: data.values,
-                backgroundColor: generateColors(data.values.length)
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-}
-
-// Render Line Chart
-function renderLineChart(canvasId, data) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) return;
-
-    if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
-
-    chartInstances[canvasId] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.labels,
-            datasets: [{
-                label: 'Tren',
-                data: data.values,
-                borderColor: '#10b981',
+                backgroundColor: type === 'pie' ? generateColors(data.values.length) : '#3b82f6',
+                borderColor: type === 'line' ? '#10b981' : undefined,
                 fill: false
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: type === 'bar' || type === 'line' ? { y: { beginAtZero: true } } : {},
+            plugins: {
+                legend: { display: true, position: 'top' },
+                title: {
+                    display: true,
+                    text: canvasId.replace('chart-', '').replace(/-/g, ' ').toUpperCase()
+                }
+            },
+            ...options
         }
-    });
+    };
+
+    chartInstances[canvasId] = new Chart(ctx, config);
 }
 
-// Generate random colors for pie chart
+// 🌈 Warna acak untuk pie
 function generateColors(n) {
     const colors = [];
     for (let i = 0; i < n; i++) {
@@ -220,4 +76,119 @@ function generateColors(n) {
         colors.push(`hsl(${hue}, 70%, 60%)`);
     }
     return colors;
+}
+
+// 🧩 Struktur tab dan chart yang ingin dirender
+const tabChartConfig = {
+    ok: {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'AREA': 'pie',
+        'TAHUN': 'line',
+        'RANGE UMUR': 'pie'
+    },
+    spprb: {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'AREA': 'pie',
+        'TAHUN': 'line',
+        'RANGE UMUR': 'pie'
+    },
+    produksi: {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'AREA': 'pie',
+        'TAHUN': 'line',
+        'RANGE UMUR': 'pie'
+    },
+    distribusi: {
+        'SBU': 'bar',
+        'STOK DISTRIBUSI': 'bar',
+        'SALDO DISTRIBUSI': 'bar',
+        'RANGE UMUR': 'bar'
+    },
+    lancar: {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'STOK LANCAR': 'bar',
+        'SALDO LANCAR': 'bar'
+    },
+    bebas: {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'STOK BEBAS': 'bar',
+        'SALDO BEBAS': 'bar'
+    },
+    'titipan-percepatan': {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'STOK TITIPAN PERCEPATAN': 'bar',
+        'SALDO TITIPAN PERCEPATAN': 'bar'
+    },
+    'titipan-murni': {
+        'SBU': 'bar',
+        'PPB': 'bar',
+        'STOK TITIPAN MURNI': 'bar',
+        'SALDO TITIPAN MURNI': 'bar'
+    },
+    op: {
+        'STOK OP': 'bar',
+        'SALDO OP': 'bar'
+    },
+    ppb: {
+        'STOK PPB': 'bar',
+        'SALDO PPB': 'bar'
+    },
+    site: {
+        'STOK SITE': 'bar',
+        'SALDO SITE': 'bar'
+    }
+};
+
+// 🚀 Fungsi utama: update chart berdasarkan tab & data
+function updateCharts(tab, items) {
+    if (!Array.isArray(items)) {
+        console.warn(`⚠️ Data untuk tab "${tab}" bukan array.`);
+        items = [];
+    }
+
+    if (items.length === 0) {
+        console.warn(`⚠️ Tidak ada data untuk tab "${tab}".`);
+        return;
+    }
+
+    const config = tabChartConfig[tab];
+    if (!config) {
+        console.warn(`⚠️ Tidak ada konfigurasi chart untuk tab "${tab}"`);
+        return;
+    }
+
+    for (const [key, chartType] of Object.entries(config)) {
+        const chartId = `chart-${tab}-${normalizeKey(key)}`;
+        const chartData = groupBy(items, key);
+        renderChart(chartId, chartType, chartData);
+    }
+}
+
+// 📊 Inisialisasi semua chart dengan dummy data
+function initializeDefaultCharts() {
+    const emptyData = {
+        labels: ['No Data'],
+        values: [1],
+        label: 'Tidak Ada Data'
+    };
+
+    Object.entries(tabChartConfig).forEach(([tab, config]) => {
+        for (const key of Object.keys(config)) {
+            const chartId = `chart-${tab}-${normalizeKey(key)}`;
+            renderChart(chartId, config[key], emptyData, {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Data Belum Tersedia'
+                    }
+                }
+            });
+        }
+    });
 }
