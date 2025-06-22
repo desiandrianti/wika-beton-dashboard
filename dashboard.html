@@ -12,6 +12,7 @@
 </head>
 <body class="bg-gray-50">
   <div class="flex h-screen">
+
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
       <div class="p-4 flex justify-end">
@@ -46,156 +47,173 @@
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-8">
       <!-- Inventory Section -->
-      <section id="inventory-section" class="section">
-        <h1 class="text-2xl font-semibold text-gray-800 mb-6">Inventory Management</h1>
-        <div class="tab-container mb-8">
-          <div class="flex whitespace-nowrap">
-          <button class="tab active" data-tab="ok">Monitoring OK</button>
-          <button class="tab" data-tab="spprb">Monitoring SPPRB</button>
-          <button class="tab" data-tab="produksi">Monitoring Produksi</button>
-          <button class="tab" data-tab="distribusi">Monitoring Distribusi</button>
-          <button class="tab" data-tab="lancar">Monitoring Stok Lancar</button>
-          <button class="tab" data-tab="bebas">Monitoring Stok Bebas</button>
-          <button class="tab" data-tab="titipan-percepatan">Monitoring Stok Titipan Percepatan</button>
-          <button class="tab" data-tab="titipan-murni">Monitoring Stok Titipan Murni</button>
-          <button class="tab" data-tab="op">Monitoring Stok OP</button>
-          <button class="tab" data-tab="ppb">Monitoring Stok PPB</button>
-          <button class="tab" data-tab="site">Monitoring Stok Site</button>
+      <div id="inventory-section" class="dashboard-section section">
+        <div class="flex space-x-2 mb-4">
+          <button class="tab active" data-tab="tab-ok">OK</button>
+          <button class="tab" data-tab="tab-spprb">SPPRB</button>
+          <button class="tab" data-tab="tab-produksi">Produksi</button>
+          <button class="tab" data-tab="tab-distribusi">Distribusi</button>
+          <button class="tab" data-tab="tab-lancar">Stok Lancar</button>
+          <button class="tab" data-tab="tab-bebas">Stok Bebas</button>
+          <button class="tab" data-tab="tab-titipan-percepatan">Titipan Percepatan</button>
+          <button class="tab" data-tab="tab-titipan-murni">Titipan Murni</button>
+          <button class="tab" data-tab="tab-op">OP</button>
+          <button class="tab" data-tab="tab-ppb">PPB</button>
+          <button class="tab" data-tab="tab-site">Site</button>
+        </div>
+      
+        <div class="tab-content-wrapper">
+          <!-- Tab OK -->
+          <div class="tab-content active" id="tab-ok">
+            <h3>Monitoring OK</h3>
+            <div class="chart-grid">
+              <canvas id="chart-ok-sbu"></canvas>
+              <canvas id="chart-ok-ppb"></canvas>
+              <canvas id="chart-ok-area"></canvas>
+              <canvas id="chart-ok-tahun"></canvas>
+              <canvas id="chart-ok-range_umur"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab SPPRB -->
+          <div class="tab-content" id="tab-spprb">
+            <h3>Monitoring SPPRB</h3>
+            <div class="chart-grid">
+              <canvas id="chart-spprb-sbu"></canvas>
+              <canvas id="chart-spprb-ppb"></canvas>
+              <canvas id="chart-spprb-area"></canvas>
+              <canvas id="chart-spprb-tahun"></canvas>
+              <canvas id="chart-spprb-range_umur"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Produksi -->
+          <div class="tab-content" id="tab-produksi">
+            <h3>Monitoring PRODUKSI</h3>
+            <div class="chart-grid">
+              <canvas id="chart-produksi-sbu"></canvas>
+              <canvas id="chart-produksi-ppb"></canvas>
+              <canvas id="chart-produksi-area"></canvas>
+              <canvas id="chart-produksi-tahun"></canvas>
+              <canvas id="chart-produksi-range_umur"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Distribusi -->
+          <div class="tab-content" id="tab-distribusi">
+            <h3>Monitoring DISTRIBUSI</h3>
+            <div class="chart-grid">
+              <canvas id="chart-distribusi-sbu"></canvas>
+              <canvas id="chart-distribusi-stok_distribusi"></canvas>
+              <canvas id="chart-distribusi-saldo_distribusi"></canvas>
+              <canvas id="chart-distribusi-range_umur"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Stok Lancar -->
+          <div class="tab-content" id="tab-lancar">
+            <h3>Monitoring STOK LANCAR</h3>
+            <div class="chart-grid">
+              <canvas id="chart-lancar-sbu"></canvas>
+              <canvas id="chart-lancar-ppb"></canvas>
+              <canvas id="chart-lancar-stok_lancar"></canvas>
+              <canvas id="chart-lancar-saldo_lancar"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Stok Bebas -->
+          <div class="tab-content" id="tab-bebas">
+            <h3>Monitoring STOK BEBAS</h3>
+            <div class="chart-grid">
+              <canvas id="chart-bebas-sbu"></canvas>
+              <canvas id="chart-bebas-ppb"></canvas>
+              <canvas id="chart-bebas-stok_bebas"></canvas>
+              <canvas id="chart-bebas-saldo_bebas"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Titipan Percepatan -->
+          <div class="tab-content" id="tab-titipan-percepatan">
+            <h3>Monitoring TITIPAN PERCEPATAN</h3>
+            <div class="chart-grid">
+              <canvas id="chart-titipan-percepatan-sbu"></canvas>
+              <canvas id="chart-titipan-percepatan-ppb"></canvas>
+              <canvas id="chart-titipan-percepatan-stok_titipan_percepatan"></canvas>
+              <canvas id="chart-titipan-percepatan-saldo_titipan_percepatan"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Titipan Murni -->
+          <div class="tab-content" id="tab-titipan-murni">
+            <h3>Monitoring TITIPAN MURNI</h3>
+            <div class="chart-grid">
+              <canvas id="chart-titipan-murni-sbu"></canvas>
+              <canvas id="chart-titipan-murni-ppb"></canvas>
+              <canvas id="chart-titipan-murni-stok_titipan_murni"></canvas>
+              <canvas id="chart-titipan-murni-saldo_titipan_murni"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab OP -->
+          <div class="tab-content" id="tab-op">
+            <h3>Monitoring OP</h3>
+            <div class="chart-grid">
+              <canvas id="chart-op-stok_op"></canvas>
+              <canvas id="chart-op-saldo_op"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab PPB -->
+          <div class="tab-content" id="tab-ppb">
+            <h3>Monitoring PPB</h3>
+            <div class="chart-grid">
+              <canvas id="chart-ppb-stok_ppb"></canvas>
+              <canvas id="chart-ppb-saldo_ppb"></canvas>
+            </div>
+          </div>
+                
+          <!-- Tab Site -->
+          <div class="tab-content" id="tab-site">
+            <h3>Monitoring SITE</h3>
+            <div class="chart-grid">
+              <canvas id="chart-site-stok_site"></canvas>
+              <canvas id="chart-site-saldo_site"></canvas>
+            </div>
+          </div>
+        </div>             
+      </div>
 
+      <!-- Upload Section -->
+      <section id="upload-section" class="section hidden">
+        <h1 class="text-2xl font-semibold text-gray-800 mb-6">Upload Data</h1>
+        <div class="upload-container bg-white p-6 rounded-lg shadow-sm border-2 border-dashed border-blue-400">
+          <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden">
+          <label for="excelFile" class="cursor-pointer">
+            <div class="text-center">
+              <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p class="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
+              <p class="text-xs text-gray-500">Excel files only (.xlsx, .xls)</p>
+            </div>
+          </label>
         </div>
 
-        <div id="tab-contents">
-          <div class="tab-content" id="ok">
-            <h2 class="text-xl font-bold mb-4">Monitoring OK</h2>
-            <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ok-sbu" class="w-full h-[300px]"></canvas></div>
-            <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ok-kategori" class="w-full h-[300px]"></canvas></div>
-            <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ok-tren" class="w-full h-[300px]"></canvas></div>
-            <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ok-range" class="w-full h-[300px]"></canvas></div>
+        <section id="preview-section" class="hidden mt-8" style="width: 100%; max-width: 1100px; margin: 0 auto;">
+          <h2 class="text-xl font-bold mb-4 text-center">Data Preview</h2>
+          <div class="table-wrapper" style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <table id="preview-table" style="width: max-content; min-width: 100%; border-collapse: collapse; font-size: 15px;"></table>
           </div>
-
-        <div class="tab-content hidden" id="spprb">
-        <h2 class="text-xl font-bold mb-4">Monitoring SPPRB</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-spprb-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-spprb-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-spprb-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-spprb-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="produksi">
-        <h2 class="text-xl font-bold mb-4">Monitoring Produksi</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-produksi-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-produksi-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-produksi-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-produksi-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="distribusi">
-        <h2 class="text-xl font-bold mb-4">Monitoring Distribusi</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-distribusi-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-distribusi-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-distribusi-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-distribusi-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="lancar">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok Lancar</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-lancar-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-lancar-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-lancar-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-lancar-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="bebas">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok Bebas</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-bebas-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-bebas-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-bebas-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-bebas-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="titipan-percepatan">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok Titipan Percepatan</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-percepatan-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-percepatan-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-percepatan-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-percepatan-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="titipan-murni">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok Titipan Murni</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-murni-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-murni-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-murni-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-titipan-murni-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="op">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok OP</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-op-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-op-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-op-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-op-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="ppb">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok PPB</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ppb-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ppb-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ppb-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-ppb-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
-      <div class="tab-content hidden" id="site">
-        <h2 class="text-xl font-bold mb-4">Monitoring Stok Site</h2>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-site-sbu" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-site-kategori" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-site-tren" class="w-full h-[300px]"></canvas></div>
-        <div class="max-h-[400px] overflow-auto mb-6"><canvas id="chart-site-range" class="w-full h-[300px]"></canvas></div>
-      </div>
-
+          <div class="mt-6 flex justify-center">
+            <button id="analyzeButton" class="bg-blue-600 text-white text-base px-6 py-3 rounded-lg hover:bg-blue-700 transition-all">
+              Analyze Data
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 mt-2 text-center" id="preview-info"></p>
+        </section>
       </section>
-
-<!-- Upload Section -->
-<section id="upload-section" class="section hidden">
-  <h1 class="text-2xl font-semibold text-gray-800 mb-6">Upload Data</h1>
-
-  <!-- Kotak upload -->
-  <div class="upload-container bg-white p-6 rounded-lg shadow-sm border-2 border-dashed border-blue-400">
-    <input type="file" id="excelFile" accept=".xlsx,.xls" class="hidden">
-    <label for="excelFile" class="cursor-pointer">
-      <div class="text-center">
-        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <p class="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
-        <p class="text-xs text-gray-500">Excel files only (.xlsx, .xls)</p>
-      </div>
-    </label>
-  </div>
-
-  <!-- Preview tabel pindah ke luar upload-container -->
-  <section id="preview-section" class="hidden mt-8" style="width: 100%; max-width: 1100px; margin: 0 auto;">
-    <h2 class="text-xl font-bold mb-4 text-center">Data Preview</h2>
-
-    <!-- Scroll horizontal dan batas -->
-    <div class="table-wrapper" style="overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
-      <table id="preview-table" style="width: max-content; min-width: 100%; border-collapse: collapse; font-size: 15px;"></table>
-    </div>
-
-    <div class="mt-6 flex justify-center">
-      <button id="analyzeButton" class="bg-blue-600 text-white text-base px-6 py-3 rounded-lg hover:bg-blue-700 transition-all">
-        Analyze Data
-      </button>
-    </div>
-
-    <p class="text-sm text-gray-600 mt-2 text-center" id="preview-info"></p>
-  </section>
     </main>
   </div>
-
-  <script src="js/charts.js"></script>
-  <script src="js/upload.js"></script>
-  <script src="js/main.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -226,5 +244,10 @@
       });
     });
   </script>
+
+  <!-- JS Files -->
+  <script src="js/charts.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
