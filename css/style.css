@@ -11,7 +11,6 @@ body {
   font-family: 'Montserrat', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: var(--accent-color);
 }
 
 .text-primary {
@@ -47,9 +46,7 @@ body {
   background-color: var(--primary-color);
   color: var(--secondary-color);
   width: 250px;
-  min-width: 60px;
   transition: all 0.3s ease;
-  min-height: 100vh;
 }
 
 .sidebar.collapsed {
@@ -63,7 +60,6 @@ body {
   color: var(--secondary-color);
   text-decoration: none;
   transition: background-color 0.3s ease;
-  font-size: 0.875rem;
 }
 
 .nav-link:hover {
@@ -75,7 +71,7 @@ body {
 }
 
 /* === Tabs === */
-.tabs {
+.tab-container {
   border-bottom: 2px solid var(--accent-color);
   display: flex;
   gap: 1rem;
@@ -84,7 +80,7 @@ body {
 }
 
 .tab {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
@@ -92,7 +88,7 @@ body {
   background: none;
   border: none;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .tab:hover {
@@ -102,15 +98,7 @@ body {
 .tab.active {
   border-bottom: 2px solid var(--primary-color);
   color: var(--primary-color);
-  font-weight: 600;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
+  font-weight: 500;
 }
 
 /* === Cards === */
@@ -124,12 +112,6 @@ body {
 
 .metric-card:hover {
   transform: translateY(-2px);
-}
-
-.chart-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
 }
 
 /* === Chart Container === */
@@ -231,55 +213,58 @@ body {
 
 /* === Table: Preview Upload === */
 .preview-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  background: white;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
 }
 
 .preview-table th,
 .preview-table td {
-  padding: 0.75rem;
-  border: 1px solid var(--accent-color);
-  text-align: left;
+    padding: 0.75rem;
+    border: 1px solid var(--accent-color);
+    text-align: left;
 }
 
 .preview-table th {
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  font-weight: 500;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    font-weight: 500;
 }
 
 .preview-table tr:nth-child(even) {
-  background-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 .preview-table tr:hover {
-  background-color: rgba(0, 71, 171, 0.05);
+    background-color: rgba(0, 71, 171, 0.05);
 }
 
 /* Font Styles */
 .font-montserrat {
-  font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
+    .sidebar {
+        width: 60px;
+    }
 
-  .sidebar .nav-link span {
-    display: none;
-  }
+    .sidebar .nav-link span {
+        display: none;
+    }
 
-  .metric-card,
-  .chart-container {
-    margin-bottom: 1rem;
-  }
+    .metric-card {
+        margin-bottom: 1rem;
+    }
 
-  .tab {
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-  }
+    .chart-container {
+        margin-bottom: 1.5rem;
+    }
+
+    .tab {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
 }
